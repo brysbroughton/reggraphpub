@@ -1,0 +1,132 @@
+/*------------------------------
+              FIXES
+------------------------------*/
+
+#content {width: 100% !important}
+
+#content_body {float: none}
+
+#content_footer {width: 100% !important}
+
+#announcement_text_ifr {height: 300px !important}
+
+h2 {margin: 0}
+
+dl, dt, dd, dl dt, dl dd {margin:0}
+
+
+/*------------------------------
+              CANVAS
+------------------------------*/
+
+#async_canvas {height:300px; min-width:100%}
+
+#canvas_notice {
+  color: #34549B;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+#canvas_header {
+  float: left;
+  clear: both;
+  width: 100%;
+  text-align: center;
+}
+
+  #canvas_label {font-size:16px; font-weight:900}
+
+#canvas_wrapper {
+  width: 100%;
+  text-align: center;
+  overflow-x: auto;
+}
+
+  #canvas_axis {
+    width: 100%;
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 25px;
+    text-align: center;
+  }
+
+#canvas_legend {margin-top:10px; float:left; clear:left}
+
+ #canvas_legend dl {}
+ 
+   #canvas_legend dl dt {
+    display: inline-block;
+    margin: 1px 0px 0px 0px;
+    float: left;
+    clear: left;
+    height: 14px;
+    width: 14px;
+   }
+   
+   #canvas_legend dl dd {
+    display: inline-block;
+    margin-left: 10px;
+    float: left;
+    clear: right;
+   }
+
+#canvas_button {margin-top:10px; float:right; clear:right}
+
+
+  #section_info dl {}
+
+    #section_info dl dt{
+      float: left;
+      clear: left;
+      width: 100px;
+      border-top: 1px solid #DDDDDD;
+      border-left: 1px solid #DDDDDD;
+      line-height: 24px;
+      text-align: right;
+      padding: 4px 15px 4px 0px;
+    }
+      #section_info dl dt:last-of-type {border-bottom:1px solid #DDDDDD}
+      #section_info dl dt:hover {background:#F7F7F7}
+      #section_info dl dt:hover + dd {background:#8FA1C8}
+    
+    #section_info dl dd{
+      float: left;
+      clear: right;
+      height: 24px;
+      width: 250px;
+      border: 1px solid #DDDDDD;
+      border-bottom: none;
+      line-height: 24px;
+      background: #F7F7F7;
+      padding: 4px 15px 4px 15px;
+    }
+      #section_info dl dd:last-of-type{border-bottom:1px solid #DDDDDD}
+
+/*------------------------------
+          SOCIAL MEDIA
+------------------------------*/
+
+#facebook_wrapper {margin-right:7px;}
+#twitter_wrapper iframe {width:93px !important}
+
+/*------------------------------
+              FORM
+------------------------------*/
+
+#feedback_wrapper > p, #feedback_form > *{display:block;margin:10px 0px;}
+
+#feedback_text {
+  min-height: 200px;
+  width: 385px;
+  border: 1px solid #DDDDDD;
+  background: #F7F7F7;
+  resize: none;
+}
+    
+
+    
+.clearfix:after{content:" ";display:block;clear:both;}
+.ModularBlock{float:left;margin:20px 0px 20px 0px;margin-collapse:collapse;}
+.ModularBlock > *{padding:10px;}
+#section_info.ModularBlock{padding-left:0px;}
+#canvas_media > span{display:inline-block;float:left;}
