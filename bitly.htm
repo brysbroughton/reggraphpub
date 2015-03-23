@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Get a shortend url from bitly api</title>
+</head>
+<script src="https://www.otc.edu/JSSCRIPTS/jquery/jquery-1.6.2.min.js"></script>
+<script>$('document').ready(function () {$('body').html("jquery in tha house")});
+    $.getJSON(
+        'https://api-ssl.bitly.com/v3/shorten?access_token=78fc820ee59fbf035db3e480ec2df348372d620e&longUrl=http%3A%2F%2Fotc.edu%2F',
+        function(data) {
+            console.log('fin: ', data);
+            $('body').html(''+data.data.url);
+        }
+    );
+</script>
+<body>
+    
+</body>
+</html>

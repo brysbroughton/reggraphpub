@@ -4,13 +4,22 @@
 	    enrollment_chart = new OTCChart('async_canvas');
 	    enrollment_chart.setStateFromURL();
 	    enrollment_chart.initChart();
-	  
+	    
+	    //Bind canvas redraw to the semester drop-down selection
 	    $('#semester').val(enrollment_chart.parameters.semester);
 	    $('#semester').bind('change', function(){
 			    enrollment_chart.parameters.semester = $('#semester').val();
 			    enrollment_chart.pushStateToURL();
 		    });
 	  
+	    //Bind the all departments graph to the "Load all departments" button
+	    $('#load_all_departments').bind('click', {self:enrollment_chart}, function(event){
+		self = enrollment_chart;//providing alias to keep with convention
+		if (self.parameters.section) delete self.parameters.section
+		if (self.parameters.course) delete self.parameters.course
+		if (self.parameters.department) delete self.parameters.department
+		self.pushStateToURL();
+	    })
         };
         
       function OTCChart (chart_id) {
