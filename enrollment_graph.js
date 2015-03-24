@@ -63,9 +63,11 @@
               }
             }
           }
-          
           self.parameters = new_params;
-          
+		  if(!self.parameters.semester){
+			self.parameters.semester = $('#semester').val();
+		  }
+		  
         }
         
 		
