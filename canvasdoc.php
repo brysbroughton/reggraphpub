@@ -156,6 +156,15 @@ value="Search" />
                                     <dd>Returned data rows will be ordered by the <span class="api_code">total_seats</span> column.</dd>
                                 </dl>
                             </dd>
+							<dt>semester</dt>
+							<dd>Selects the semester to return information for.</dd>
+							<dd><p><strong>values:</strong></p>
+								<dl>
+									<dt>possible values</dt>
+									<dd>The select list is populated from the database so that only available semesters appear for selection. The possible semesters should only be Fall, Spring, and Summer.</dd>
+									
+								</dl>
+							</dd>
                         </dl>
                     </div>
                         
