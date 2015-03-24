@@ -127,17 +127,16 @@ foreach($semesters as $key=>$value)
                       <div id="canvas_notice"><p><em>Click a bar to get more information</em></p></div>
                       <div id="canvas_legend"></div>
                       <div id="canvas_button">
-                          <label for="semester">Semester: </label>
-                          <select id="semester" name="semester">
-                              <!--<option value="all">All</option>-->
-                              <?php print($semesters_avail) ?>
-                          </select>
-                          <a class="button" href="#" id="btn-download"><button id="download-button" value="Download">Download</button></a>
-                          <input type="button" id="load_all_departments" value="Load all departments">
-                          <input type="button" id="order_by_value" value="Order By Name">
-                          <input type="button" id="order_by_department" value="Order By Seats">
+                        <label for="semester">Semester: </label>
+                        <select id="semester" name="semester">
+                          <?php print($semesters_avail) ?>
+                        </select>
+                        <a class="button" href="#" id="download_button"><input type="button" value="Download .png Copy"></button></a>
+                        <input type="button" id="load_all_departments" value="Load All Departments">
+                        <input type="button" id="order_by_name" value="Order By Name">
+                        <input type="button" id="order_by_value" value="Order By Seats">
                       </div>
-		      <div class="clearfix"></div>
+		              <div class="clearfix"></div>
                       <div id="section_info" class="ModularBlock"></div>
                       <div id="feedback_wrapper" class="ModularBlock">
                         <p>Was this page helpful? Tell us about it.</p>

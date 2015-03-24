@@ -1,4 +1,5 @@
       window.onload = function () {
+        //Set all necessary default values & inits
 	    enrollment_chart = new OTCChart('async_canvas');
 	    enrollment_chart.setStateFromURL();
 	    enrollment_chart.parameters.semester = enrollment_chart.parameters.semester || 'summer';
@@ -6,92 +7,74 @@
 	    enrollment_chart.initChart();        
 	    console.log(enrollment_chart.parameters);
 	    
-	    //Bind canvas redraw to the semester drop-down selection
+	    //Sets semester drop-down value & loads new semester if drop-down is changed
 	    $('#semester').val(enrollment_chart.parameters.semester);
-	    $('#semester').bind('change', function(){
+	    $('#semester').change(function(){
 			enrollment_chart.parameters.semester = $('#semester').val();
 			enrollment_chart.pushStateToURL();
 		});
-	    //Bind the Download button to the saveCanvas function
-		$('#btn-download').bind('click', function(){
-			saveCanvas();
-			});
-		//Bind the order by buttons to the order by function
-		$('#order_by_value').bind('click', function(){
-			orderBy('value');
-		});
-		$('#order_by_department').bind('click', function(){
-			orderBy('chart_val');
-		});
-	  
-	    //Bind the all departments graph to the "Load all departments" button
-	    $('#load_all_departments').bind('click', {self:enrollment_chart}, function(event){
+        
+        //Download button onclick calls saveCanvas()
+        $('#download_button').click(function(){saveCanvas()});
+        
+        //Orderby buttons onclick call orderBy()
+        $('#order_by_name').click(function(){orderBy('name')});
+        $('#order_by_value').click(function(){orderBy('value')});
+	    
+        //Load_all onclick loads all departments
+        $('#load_all_departments').click({self:enrollment_chart}, function(event){
             self = enrollment_chart;//providing alias to keep with convention
             if (self.parameters.section) delete self.parameters.section
             if (self.parameters.course) delete self.parameters.course
             if (self.parameters.department) delete self.parameters.department
             self.pushStateToURL();
-	    });
-
-        //Set the URLs for the social media buttons
-        setMediaURL();
+        });
       };
 
       function OTCChart (chart_id) {
-      // @class
-      // instantiate using keyword 'new'
+        // @class
+        // instantiate using keyword 'new'
         var self = this;//closure to pass to anon functions, will always refer to this instance of OTCChart
         this.chart_id = chart_id;
         this.parameters = {'data':'enrollment'};//default is enrollment for all college
 
-	//@instance methods
+	    //@instance methods
         this.setStateFromURL = function () {
-          //checks current url for correct hashbang query
-          //if found, initializes chart with the parameters from the string
-          
-          var new_params = {};
-          
-          if (window.location.href.indexOf('#!') != -1) {
-            var query = window.location.href.split('#!')[1];
-            var param_strings = query.split('&');
-
-            for (var i = 0, j = param_strings.length; i < j; i++) {
-              //code
-              var tokens = param_strings[i].split('=');
-              if (tokens.length === 2) {
-                var name = tokens[0];
-                var value = tokens[1];
-                if (OTCChart.isValidParameter(name)) {
-                  new_params[name] = value;
+            //checks current url for correct hashbang query
+            //if found, initializes chart with the parameters from the string
+            
+            var new_params = {};
+            
+            if (window.location.href.indexOf('#!') != -1) {
+                var query = window.location.href.split('#!')[1];
+                var param_strings = query.split('&');
+                
+                for (var i = 0, j = param_strings.length; i < j; i++) {
+                    var tokens = param_strings[i].split('=');
+                    
+                    if (tokens.length === 2) {
+                        var name = tokens[0];
+                        var value = tokens[1];
+                        
+                        if (OTCChart.isValidParameter(name)) {new_params[name] = value}
+                    }
                 }
-              }
             }
-          }
-          
-          self.parameters = new_params;
-          
+            self.parameters = new_params;
         }
         
-		
         this.pushStateToURL = function () {
-
-          var new_url = [location.protocol, '//', location.host, location.pathname].join('');
-
-          new_url += '#!';
-          var parameters = self.parameters;
-
-          for (var parameter in parameters) {
-			  
-            new_url += parameter + '=' + parameters[parameter] + '&';
-			
-          }
-          new_url = new_url.replace(/\&$/,'');//remove trailing &
-
-          if (window.location.href !== new_url) {
+            var new_url = [location.protocol, '//', location.host, location.pathname].join('');
+            new_url += '#!';
+            
+            var parameters = self.parameters;
+            
+            for (var parameter in parameters) {new_url += parameter + '=' + parameters[parameter] + '&'}
+            
+            new_url = new_url.replace(/\&$/,'');//remove trailing &
+            
             //only push url if it's different - prevents unnecessary back button presses
-            window.location.href = new_url;
-          }
-          
+            if (window.location.href !== new_url) {window.location.href = new_url}
         }
        
         //@instance method
@@ -124,11 +107,10 @@
             var newWidth = 0;
             
             for(var i = 0; i < chartData.datasets.length; i++) {
-                for(var j = 0; j < chartData.datasets[i].data.length; j++) {
-                    newWidth += (5 + 10);
-                }
+                for(var j = 0; j < chartData.datasets[i].data.length; j++) {newWidth += (5 + 10)}
             }
             newWidth += 20; //Y-axis buffer width
+            
             if (newWidth >= ctx.canvas.width) {
               ctx.canvas.width = newWidth;
             }
@@ -147,52 +129,37 @@
                 var active_points = self.myBar.getBarsAtEvent(evt);
                 self.initChartFromClick(active_points);
             };
-	    document.getElementById("canvas_legend").innerHTML = self.myBar.generateLegend();
+	        document.getElementById("canvas_legend").innerHTML = self.myBar.generateLegend();
         }
         
         //@instance method
         this.initChartFromClick = function (active_points) {
-	    //Use information from internal parameters and the active_points to determine next state
-	    if (active_points.length < 0) {
-		//click was not on a bar
-		return;
-	    }
-	
-	    clicked_parameter = (active_points[0]['label'].split('-')[1]) ? (active_points[0]['label'].split('-')[1]) : (active_points[0]['label']);
-	    
-	    if (self.parameters.section) {
-		self.parameters.section = clicked_parameter;
-	    } else {
-		if (self.parameters.course) {
-		    self.parameters.section = clicked_parameter;
-		} else if (self.parameters.department) {
-		    self.parameters.course = clicked_parameter;
-		} else {
-		    self.parameters.department = clicked_parameter; //this is the most general selection that can happen
-		}
-	    }
-	    //self.parameters.orderby = setOrderBy(self); //calling setOrderBy() here overrides any current orderby setting <Louis>
-	    self.pushStateToURL();
-	    self.requestChartJSON(self.genChartFromJSON);
+            //Use information from internal parameters and the active_points to determine next state
+            if (active_points.length < 0) {return} //click was not on a bar
+        
+            clicked_parameter = (active_points[0]['label'].split('-')[1]) ? (active_points[0]['label'].split('-')[1]) : (active_points[0]['label']);
+            
+            if (self.parameters.section) {self.parameters.section = clicked_parameter}
+            else {
+                if (self.parameters.course) {self.parameters.section = clicked_parameter}
+                else if (self.parameters.department) {self.parameters.course = clicked_parameter}
+                else {self.parameters.department = clicked_parameter} //this is the most general selection that can happen
+            }
+            self.pushStateToURL();
+            self.requestChartJSON(self.genChartFromJSON);
         }
        
         this.generateSectionDetails = function() {
             var url = OTCChart.API_HOST + '?data=all';
-                
-            for (param in self.parameters) {//building server-side query from internal parameters
-            url += '&' + param + '=' + self.parameters[param];
-            }
-                $.getJSON(
-                    url,
-                    function (data) {
-                display_section_data(data, "section_info");
-                    }
-                );
+            
+            //building server-side query from internal parameters
+            for (param in self.parameters) {url += '&' + param + '=' + self.parameters[param]}
+            
+            $.getJSON(url, function (data) {display_section_data(data, "section_info")});
         }
-	   
+
         //@instance method
         this.initChart = function() {
-            
             if(self.parameters.section){self.generateSectionDetails()}
 			
             //fixing forward/back button functionality
@@ -206,80 +173,74 @@
             self.requestChartJSON(self.genChartFromJSON);
         }
       }
-      
+
       //@static constants
       OTCChart.VALID_PARAMETERS = ['DATA','DEPARTMENT','COURSE','SECTION','ORDERBY','SEMESTER'];
       OTCChart.API_HOST = 'http://webdev.otc.edu/canvas/backend/classpull.php';
-      
+
       //@static methods of OTCChart
       OTCChart.isValidParameter = function (param_name) {
-          //takes string
-          //returns boolean
           param_name = param_name.toUpperCase();
           return (OTCChart.VALID_PARAMETERS.indexOf(param_name) != -1);
-        }
-        
+      }
+
       //@static method
       OTCChart.translateChartData = function (json) {
-        //take a json object and translate it to the nested array that canvas expects
-			if(enrollment_chart.parameters.data == "all"){
-			  enrollment_chart.parameters.sectionInfo = json;
-			}
-			
-            var headings = [];
-            var empty_counts = [];
-            var enroll_counts = [];
-            var dataset_label = '';
-            var dataset_axis = '';
-
-            //Build chartData arrays from json
-            if(json.courses) {
-                for(var i = 0; i < json.courses.length; i++) {
-                    if(json.courses[i].section) {
-                        headings[i] = json.courses[i].course + '-' + json.courses[i].section; 
-                    } else if(json.courses[i].course) {
-                        headings[i] = json.courses[i].course; 
-                    } else {
-                        headings[i] = json.courses[i].department.substring(0,3);
-                    }
-                    empty_counts[i] = json.courses[i].empty_seats;
-                    enroll_counts[i] = json.courses[i].total_seats - json.courses[i].empty_seats;
-                }
-
-            }
-            //Added to create a label under the chart showing what the displayed information is relevent to
-			if(json.courses)
-			{
-                dataset_label = '<span id="canvas_label">';
-                if (json.courses[0].course) {
-                    dataset_label += json.department_name;
-                    dataset_axis = json.department_code + ' Courses';
-                } else {
-                    dataset_label += 'All Departments';
-                    dataset_axis = 'Departments';
-                }
-                if (json.courses[0].section) {
-
-                    if (json.courses.length == 1) {
-                        dataset_label += ': ' + json.courses[0].title + ' (' + json.courses[0].course + '-' + json.courses[0].section + ')';
-                        dataset_axis = 'Section of ' + json.department_code + ' ' + json.courses[0].course + '-' + json.courses[0].section;
-                    } else {
-                        dataset_label += ': ' + json.courses[0].title + ' (' + json.courses[0].course + ')';
-                        dataset_axis = 'Sections of ' + json.department_code + ' ' + json.courses[0].course;
-                    }
-                }
-                dataset_label += '</span>';
-			}
-			$('#canvas_header').html(dataset_label);
-            $('#canvas_axis').html(dataset_axis);
-			
-			
-			
-            var chartData = {
-              labels : headings,
-              datasets : [
+          //take a json object and translate it to the nested array that canvas expects
+          if(enrollment_chart.parameters.data == "all"){enrollment_chart.parameters.sectionInfo = json}
+          
+          var headings = [];
+          var empty_counts = [];
+          var enroll_counts = [];
+          var dataset_label = '';
+          var dataset_axis = '';
+          
+          //Build chartData arrays from json
+          if(json.courses) {
+              for(var i = 0; i < json.courses.length; i++) {
+                  if(json.courses[i].section) {
+                      headings[i] = json.courses[i].course + '-' + json.courses[i].section; 
+                  } else if(json.courses[i].course) {
+                      headings[i] = json.courses[i].course; 
+                  } else {
+                      headings[i] = json.courses[i].department.substring(0,3);
+                  }
+                  empty_counts[i] = json.courses[i].empty_seats;
+                  enroll_counts[i] = json.courses[i].total_seats - json.courses[i].empty_seats;
+              }
+          }
+          
+          //Added to create a label under the chart showing what the displayed information is relevent to
+          if(json.courses)
+          {
+              dataset_label = '<span id="canvas_label">';
+              if (json.courses[0].course) {
+                  dataset_label += json.department_name;
+                  dataset_axis = json.department_code + ' Courses';
+              } else {
+                  dataset_label += 'All Departments';
+                  dataset_axis = 'Departments';
+              }
+              if (json.courses[0].section) {
+                  if (json.courses.length == 1) {
+                      dataset_label += ': ' + json.courses[0].title + ' (' + json.courses[0].course + '-' + json.courses[0].section + ')';
+                      dataset_axis = 'Section of ' + json.department_code + ' ' + json.courses[0].course + '-' + json.courses[0].section;
+                  } else {
+                      dataset_label += ': ' + json.courses[0].title + ' (' + json.courses[0].course + ')';
+                      dataset_axis = 'Sections of ' + json.department_code + ' ' + json.courses[0].course;
+                  }
+              }
+              dataset_label += '</span>';
+          }
+          $('#canvas_header').html(dataset_label);
+          $('#canvas_axis').html(dataset_axis);
+          
+          //Set chart labels & datasets
+          var chartData = {
+            labels : headings,
+            datasets : [
               {
-				label: "Empty Seats",
+                label: "Empty Seats",
                 fillColor : "rgba(200,200,200,0.4)",
                 strokeColor : "rgba(200,200,200,0.8)",
                 highlightFill : "rgba(200,200,200,0.75)",
@@ -287,7 +248,7 @@
                 data : empty_counts
               },
               {
-				label: "Filled Seats",
+                label: "Filled Seats",
                 fillColor : "rgba(30,67,145,0.5)",
                 strokeColor : "rgba(30,67,145,0.8)",
                 highlightFill : "rgba(27,69,166,0.75)",
@@ -295,109 +256,74 @@
                 data : enroll_counts
               }
             ]
-            }
-            
-            return chartData;
-        }
+          }
+          
+          return chartData;
+      }
 
-
-	function saveCanvas()
-	{
+	function saveCanvas() {
 		var canvas = document.getElementById('async_canvas');
 		var dataURL = canvas.toDataURL();
-		var button = document.getElementById('btn-download');
+		var button = document.getElementById('download_button');
 		var filename = document.getElementById('canvas_label').innerText;
 		
+        // Opera 8.0+ (UA detection to detect Blink/v8-powered Opera)
 		var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
-			// Opera 8.0+ (UA detection to detect Blink/v8-powered Opera)
-		var isFirefox = typeof InstallTrigger !== 'undefined';   // Firefox 1.0+
+        
+        // Firefox 1.0+
+		var isFirefox = typeof InstallTrigger !== 'undefined';
+        
+        // At least Safari 3+: "[object HTMLElementConstructor]"
 		var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
-			// At least Safari 3+: "[object HTMLElementConstructor]"
-		var isChrome = !!window.chrome && !isOpera;              // Chrome 1+
-		var isIE = /*@cc_on!@*/false || !!document.documentMode; // At least IE6
+        
+        // Chrome 1+
+		var isChrome = !!window.chrome && !isOpera;
+        
+        // At least IE6
+		var isIE = /*@cc_on!@*/false || !!document.documentMode;
 		
-		
-		if(isIE)
-		{
+		if(isIE) {
 			var instructions = "<p>To save this image, right-click on the image and select \"Save picture as\".</p>";
 			open().document.write(instructions + '<img src="'+dataURL+'"/>');
 			return false;
-		}
-		else
-		{
+		} else {
 			button.href = dataURL;
 			button.download = filename + '.png';
+            //Doesn't return in this instance? <Louis>
 		}
 	}
-	
-	function orderBy(col_name)
-	{
+
+	function orderBy(col_name) {
 		var a_or_d = enrollment_chart.parameters.orderby;
 		//delete enrollment_chart.parameters.orderby;
-		if(col_name == "value")
-		{
-			if(enrollment_chart.parameters.course)
-			{
-				enrollment_chart.parameters.orderby = 'section';
-			}
-			else if(enrollment_chart.parameters.department)
-			{
-				enrollment_chart.parameters.orderby = 'course';
-			}
-			else
-			{
-				enrollment_chart.parameters.orderby = 'department';
+		if(col_name == 'name') {
+			if(enrollment_chart.parameters.course) {enrollment_chart.parameters.orderby = 'section'}
+			else if(enrollment_chart.parameters.department) {enrollment_chart.parameters.orderby = 'course'}
+			else {enrollment_chart.parameters.orderby = 'department'}
+		} else if(col_name == 'value') {
+			if(a_or_d != 'total_seats_a' && a_or_d != 'total_seats_d') {enrollment_chart.parameters.orderby = 'total_seats_a'}
+			else {
+				if(a_or_d == 'total_seats_a' || a_or_d == 'total_seats') {enrollment_chart.parameters.orderby = 'total_seats_d'}
+				else {enrollment_chart.parameters.orderby = 'total_seats_a'}
 			}
 		}
-		else if(col_name == 'chart_val')
-		{
-			if(a_or_d != 'total_seats_a' && a_or_d != 'total_seats_d')
-			{
-				enrollment_chart.parameters.orderby = 'total_seats_a';
-			}
-			else
-			{
-				if(a_or_d == 'total_seats_a' || a_or_d == 'total_seats')
-				{
-					enrollment_chart.parameters.orderby = 'total_seats_d';
-				}
-				else
-				{
-					enrollment_chart.parameters.orderby = 'total_seats_a';
-				}
-			}
-		}
-
 		enrollment_chart.pushStateToURL();
 	}
 	
-	function display_section_data(data, divName)
-	{
+	function display_section_data(data, divName) {
 		var sec_data = data;
 		var section_data = "";
 		section_data += "<dl>";
-		for (var prop in sec_data['courses'][0])
-		{
-			if(sec_data['courses'][0].hasOwnProperty(prop))
-			{
-				if(prop != "id" && prop != "synonym" && prop != "note" && prop != "row_type")
-				{
+		for (var prop in sec_data['courses'][0]) {
+			if(sec_data['courses'][0].hasOwnProperty(prop)) {
+				if(prop != "id" && prop != "synonym" && prop != "note" && prop != "row_type") {
 					section_data += "<dt>" + prop.charAt(0).toUpperCase() + prop.slice(1);
 					section_data +=  ": </dt>";
 				}
-				
-				
-				if(prop != "id" && prop != "synonym" && prop != "note" && prop != "row_type")
-				{
+				if(prop != "id" && prop != "synonym" && prop != "note" && prop != "row_type") {
 					section_data += "<dd>";
-					if(prop == "start" || prop == "end")
-					{
-						section_data += convert_time((sec_data['courses'][0][prop]));
-					}
-					else
-					{
-						section_data += sec_data['courses'][0][prop];
-					}
+					if(prop == "start" || prop == "end") {section_data += convert_time((sec_data['courses'][0][prop]))}
+					else {section_data += sec_data['courses'][0][prop]}
 					section_data += "</dd>";
 				}
 			}
@@ -406,64 +332,27 @@
 		$('#' + divName).html(section_data);
 	}
 	
-	function convert_time(val)
-	{
+	function convert_time(val) {
 		var date = new Date((val*1000));
+        
 		// hours part from the timestamp
 		var hours = date.getHours();
+        
 		// minutes part from the timestamp
 		var minutes = "0" + date.getMinutes();
+        
 		// will display time in 10:30 a.m./p.m. format
-		if(hours>12)
-		{
+		if(hours>12) {
 			hours = (hours-12);
 			var formattedTime = hours + ':' + minutes.substr(minutes.length-2) + " p.m.";
-		}
-		else
-		{
+		} else {
 			var formattedTime = hours + ':' + minutes.substr(minutes.length-2) + " a.m.";
 		}
 		return formattedTime;
 	}
     
-    //Set the URLs for the social media buttons
-    function setMediaURL()
-    {
-        $.getJSON(
-          'https://api-ssl.bitly.com/v3/shorten?access_token=78fc820ee59fbf035db3e480ec2df348372d620e&longUrl=' + encodeURL(window.location.href),
-          function(bitly)
-          {
-              var twitter = $('#twitter_wrapper');
-              var facebook = $('div.fb-like');
-              var bitlyURL = bitly.data.url;
-              var baseURL = window.location.href;
-              
-              console.log('BITLY: '+bitlyURL);
-              console.log('URL: '+baseURL);
-              
-              //Get current URL without the #!
-              if (url.match(/#!/g)) {url = url.split('#!')[0]}
-              
-              //Set twitter URLs
-              twitter.html('<a href="https://twitter.com/share" class="twitter-share-button" data-url="' + bitlyURL + '" data-counturl="' + baseURL + '" data-text="Check out our real-time enrollment graph for OTC!" data-hashtags="myOTC">Tweet</a>')
-              twttr.widgets.load();
-              
-              //Set facebook URL
-              facebook.attr('data-href', baseURL);
-          }
-        );
-    }
-    
-    //Return JSON friendly URL string
-    function encodeURL(url)
-    {
-        return url.replace(/:/g, '%3A').replace(/\//g, '%2F').replace(/#/g, '%23').replace(/!/g, '%21').replace(/&/g, '%26').replace(/=/g, '%3D');
-    }
-    
     /* Feedback Form */
-    function mailForm(text)
-    {
-      var form = 'mailto:web@otc.edu?subject=Real-Time%20Enrollment%20Graph%20Feedback&body=' + text + '%0D%0A-Anonymous';
-      
-      window.location.href = form;
+    function mailForm(text) {
+        var form = 'mailto:web@otc.edu?subject=Real-Time%20Enrollment%20Graph%20Feedback&body=' + text + '%0D%0A-Anonymous';
+        window.location.href = form;
     }
