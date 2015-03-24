@@ -132,10 +132,10 @@ foreach($semesters as $key=>$value)
                               <!--<option value="all">All</option>-->
                               <?php print($semesters_avail) ?>
                           </select>
-                          <a class="button" href="#" id="btn-download" onclick="saveCanvas();"><button id="download-button" value="Download">Download</button></a>
+                          <a class="button" href="#" id="btn-download"><button id="download-button" value="Download">Download</button></a>
                           <input type="button" id="load_all_departments" value="Load all departments">
-                          <input type="button" id="order_by_value" value="Order By Bar Label" onclick="orderBy('value')">
-                          <input type="button" id="order_by_department" value="Order By Values" onclick="orderBy('chart_val')">
+                          <input type="button" id="order_by_value" value="Order By Bar Label">
+                          <input type="button" id="order_by_department" value="Order By Values">
                       </div>
 		      <div class="clearfix"></div>
                       <div id="section_info" class="ModularBlock"></div>

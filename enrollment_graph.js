@@ -11,6 +11,17 @@
 			    enrollment_chart.parameters.semester = $('#semester').val();
 			    enrollment_chart.pushStateToURL();
 		    });
+		//Bind the Download button to the saveCanvas function
+		$('#btn-download').bind('click', function(){
+			saveCanvas();
+			});
+		//Bind the order by buttons to the order by function
+		$('#order_by_value').bind('click', function(){
+			orderBy('value');
+		});
+		$('#order_by_department').bind('click', function(){
+			orderBy('chart_val');
+		});
 	  
 	    //Bind the all departments graph to the "Load all departments" button
 	    $('#load_all_departments').bind('click', {self:enrollment_chart}, function(event){
