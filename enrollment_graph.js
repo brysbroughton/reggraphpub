@@ -287,7 +287,7 @@
                 data : empty_counts
               },
               {
-				label: "Currently Enrolled Students",
+				label: "Filled Seats",
                 fillColor : "rgba(30,67,145,0.5)",
                 strokeColor : "rgba(30,67,145,0.8)",
                 highlightFill : "rgba(27,69,166,0.75)",

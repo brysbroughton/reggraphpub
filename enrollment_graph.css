@@ -103,13 +103,6 @@ dl, dt, dd, dl dt, dl dd {margin:0}
       #section_info dl dd:last-of-type{border-bottom:1px solid #DDDDDD}
 
 /*------------------------------
-          SOCIAL MEDIA
-------------------------------*/
-
-#facebook_wrapper {margin-right:7px;}
-#twitter_wrapper iframe {width:93px !important}
-
-/*------------------------------
               FORM
 ------------------------------*/
 
@@ -122,11 +115,9 @@ dl, dt, dd, dl dt, dl dd {margin:0}
   background: #F7F7F7;
   resize: none;
 }
-    
 
-    
+
 .clearfix:after{content:" ";display:block;clear:both;}
 .ModularBlock{float:left;margin:20px 0px 20px 0px;margin-collapse:collapse;}
 .ModularBlock > *{padding:10px;}
 #section_info.ModularBlock{padding-left:0px;}
-#canvas_media > span{display:inline-block;float:left;}

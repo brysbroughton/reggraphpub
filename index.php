@@ -134,30 +134,11 @@ foreach($semesters as $key=>$value)
                           </select>
                           <a class="button" href="#" id="btn-download"><button id="download-button" value="Download">Download</button></a>
                           <input type="button" id="load_all_departments" value="Load all departments">
-                          <input type="button" id="order_by_value" value="Order By Bar Label">
-                          <input type="button" id="order_by_department" value="Order By Values">
+                          <input type="button" id="order_by_value" value="Order By Name">
+                          <input type="button" id="order_by_department" value="Order By Seats">
                       </div>
 		      <div class="clearfix"></div>
                       <div id="section_info" class="ModularBlock"></div>
-                      <div id="canvas_media" class="ModularBlock">
-                        <span id="twitter_wrapper">
-                          <a href="https://twitter.com/share"
-                             class="twitter-share-button"
-                             data-url=""
-                             data-counturl=""
-                             data-text="Check out our real-time enrollment graph for OTC!"
-                             data-hashtags="myOTC">Tweet</a>
-                          <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-                        </span>
-                        <span id="facebook_wrapper">
-                          <div class="fb-like"
-                               data-href=""
-                               data-layout="button_count"
-                               data-action="like"
-                               data-show-faces="false"
-                               data-share="true"></div>
-                        </span>
-                      </div>
                       <div id="feedback_wrapper" class="ModularBlock">
                         <p>Was this page helpful? Tell us about it.</p>
                         <form id="feedback_form" name="form" action="javascript:mailForm(form.text.value)" method="post" enctype="text/plain">
