@@ -34,7 +34,7 @@ foreach($semesters as $key=>$value)
 {
 	if($value['semester'] && $value['semester'] != "")
 	{
-			$semesters_avail .= '<option value="'.$value['semester'].'">'.$value['semester'].'</option>';
+			$semesters_avail .= '<option value="'.strtolower($value['semester']).'">'.$value['semester'].'</option>';
 	}
 }
 ?>
@@ -151,6 +151,7 @@ foreach($semesters as $key=>$value)
                         </span>
                         <span id="facebook_wrapper">
                           <div class="fb-like"
+                               data-href=""
                                data-layout="button_count"
                                data-action="like"
                                data-show-faces="false"

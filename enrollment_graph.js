@@ -1,17 +1,18 @@
-    
-
       window.onload = function () {
 	    enrollment_chart = new OTCChart('async_canvas');
 	    enrollment_chart.setStateFromURL();
-	    enrollment_chart.initChart();
+	    enrollment_chart.parameters.semester = enrollment_chart.parameters.semester || 'summer';
+	    enrollment_chart.pushStateToURL();
+	    enrollment_chart.initChart();        
+	    console.log(enrollment_chart.parameters);
 	    
 	    //Bind canvas redraw to the semester drop-down selection
 	    $('#semester').val(enrollment_chart.parameters.semester);
 	    $('#semester').bind('change', function(){
-			    enrollment_chart.parameters.semester = $('#semester').val();
-			    enrollment_chart.pushStateToURL();
-		    });
-		//Bind the Download button to the saveCanvas function
+			enrollment_chart.parameters.semester = $('#semester').val();
+			enrollment_chart.pushStateToURL();
+		});
+	    //Bind the Download button to the saveCanvas function
 		$('#btn-download').bind('click', function(){
 			saveCanvas();
 			});
@@ -25,14 +26,17 @@
 	  
 	    //Bind the all departments graph to the "Load all departments" button
 	    $('#load_all_departments').bind('click', {self:enrollment_chart}, function(event){
-		self = enrollment_chart;//providing alias to keep with convention
-		if (self.parameters.section) delete self.parameters.section
-		if (self.parameters.course) delete self.parameters.course
-		if (self.parameters.department) delete self.parameters.department
-		self.pushStateToURL();
-	    })
-        };
-        
+            self = enrollment_chart;//providing alias to keep with convention
+            if (self.parameters.section) delete self.parameters.section
+            if (self.parameters.course) delete self.parameters.course
+            if (self.parameters.department) delete self.parameters.department
+            self.pushStateToURL();
+	    });
+
+        //Set the URLs for the social media buttons
+        setMediaURL();
+      };
+
       function OTCChart (chart_id) {
       // @class
       // instantiate using keyword 'new'
@@ -63,11 +67,9 @@
               }
             }
           }
+          
           self.parameters = new_params;
-		  if(!self.parameters.semester){
-			self.parameters.semester = $('#semester').val();
-		  }
-		  
+          
         }
         
 		
@@ -174,41 +176,35 @@
 	    self.requestChartJSON(self.genChartFromJSON);
         }
        
-	this.generateSectionDetails = function() {
-	    var url = OTCChart.API_HOST + '?data=all';
-			
-	    for (param in self.parameters) {//building server-side query from internal parameters
-		url += '&' + param + '=' + self.parameters[param];
-	    }
-            $.getJSON(
-                url,
-                function (data) {
-		    display_section_data(data, "section_info");
-                }
-            );
-	}
+        this.generateSectionDetails = function() {
+            var url = OTCChart.API_HOST + '?data=all';
+                
+            for (param in self.parameters) {//building server-side query from internal parameters
+            url += '&' + param + '=' + self.parameters[param];
+            }
+                $.getJSON(
+                    url,
+                    function (data) {
+                display_section_data(data, "section_info");
+                    }
+                );
+        }
 	   
         //@instance method
         this.initChart = function() {
             
-            if(self.parameters.section){
-		self.generateSectionDetails();
-	    }
+            if(self.parameters.section){self.generateSectionDetails()}
 			
             //fixing forward/back button functionality
-            $(window).bind('hashchange', function(evt) {
-			window.location.reload();
-            });
+            $(window).bind('hashchange', function(evt) {window.location.reload()});
             
             //check for hash query and translate it to the internals
             self.setStateFromURL();
-	    self.parameters.orderby = self.parameters.orderby || 'department';
-            //request chart json should refer to the internals to build its query to the backend
+	        self.parameters.orderby = self.parameters.orderby || 'department';
             
+            //request chart json should refer to the internals to build its query to the backend
             self.requestChartJSON(self.genChartFromJSON);
-			
         }
-        
       }
       
       //@static constants
@@ -430,7 +426,41 @@
 		return formattedTime;
 	}
     
-    /* FEEDBACK FORM */
+    //Set the URLs for the social media buttons
+    function setMediaURL()
+    {
+        $.getJSON(
+          'https://api-ssl.bitly.com/v3/shorten?access_token=78fc820ee59fbf035db3e480ec2df348372d620e&longUrl=' + encodeURL(window.location.href),
+          function(bitly)
+          {
+              var twitter = $('#twitter_wrapper');
+              var facebook = $('div.fb-like');
+              var bitlyURL = bitly.data.url;
+              var baseURL = window.location.href;
+              
+              console.log('BITLY: '+bitlyURL);
+              console.log('URL: '+baseURL);
+              
+              //Get current URL without the #!
+              if (url.match(/#!/g)) {url = url.split('#!')[0]}
+              
+              //Set twitter URLs
+              twitter.html('<a href="https://twitter.com/share" class="twitter-share-button" data-url="' + bitlyURL + '" data-counturl="' + baseURL + '" data-text="Check out our real-time enrollment graph for OTC!" data-hashtags="myOTC">Tweet</a>')
+              twttr.widgets.load();
+              
+              //Set facebook URL
+              facebook.attr('data-href', baseURL);
+          }
+        );
+    }
+    
+    //Return JSON friendly URL string
+    function encodeURL(url)
+    {
+        return url.replace(/:/g, '%3A').replace(/\//g, '%2F').replace(/#/g, '%23').replace(/!/g, '%21').replace(/&/g, '%26').replace(/=/g, '%3D');
+    }
+    
+    /* Feedback Form */
     function mailForm(text)
     {
       var form = 'mailto:web@otc.edu?subject=Real-Time%20Enrollment%20Graph%20Feedback&body=' + text + '%0D%0A-Anonymous';
