@@ -98,7 +98,7 @@
             var dataset_label = '';
             var dataset_axis = '';
             
-            //Builds the canvas header and axis title
+            //Builds the header & axis labels
             if(json.courses) {
                 dataset_label = '<span id="canvas_label">';
                 if (json.courses[0].course) {
