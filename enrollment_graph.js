@@ -87,14 +87,40 @@
             }
             
             //translate json in to chart.js format
-            $.getJSON(url, function(data) {end_func(OTCChart.translateChartData(data))});
+            $.getJSON(url, function(data) {end_func(OTCChart.translateChartData(data), data)});
         }
         
         //@instance method
-        this.genChartFromJSON = function (chartData) {
+        this.genChartFromJSON = function (chartData, json) {
             //Start building the chart with the data
             var ctx = document.getElementById(self.chart_id).getContext("2d");
             var newWidth = 0;
+            var dataset_label = '';
+            var dataset_axis = '';
+            
+            //Builds the canvas header and axis title
+            if(json.courses) {
+                dataset_label = '<span id="canvas_label">';
+                if (json.courses[0].course) {
+                    dataset_label += json.department_name;
+                    dataset_axis = json.department_code + ' Courses';
+                } else {
+                    dataset_label += 'All Departments';
+                    dataset_axis = 'Departments';
+                }
+                if (json.courses[0].section) {
+                    if (json.courses.length == 1) {
+                        dataset_label += ': ' + json.courses[0].title + ' (' + json.courses[0].course + '-' + json.courses[0].section + ')';
+                        dataset_axis = 'Section of ' + json.department_code + ' ' + json.courses[0].course + '-' + json.courses[0].section;
+                    } else {
+                        dataset_label += ': ' + json.courses[0].title + ' (' + json.courses[0].course + ')';
+                        dataset_axis = 'Sections of ' + json.department_code + ' ' + json.courses[0].course;
+                    }
+                }
+                dataset_label += '</span>';
+            }
+            $('#canvas_header').html(dataset_label);
+            $('#canvas_axis').html(dataset_axis);
             
             //Calcuate canvas width if # of bars exceeds default width
             for(var i = 0; i < chartData.datasets.length; i++) {
@@ -184,8 +210,6 @@
           var headings = [];
           var empty_counts = [];
           var enroll_counts = [];
-          var dataset_label = '';
-          var dataset_axis = '';
           
           //Build chartData arrays from json
           if(json.courses) {
@@ -201,31 +225,6 @@
                   enroll_counts[i] = json.courses[i].total_seats - json.courses[i].empty_seats;
               }
           }
-          
-          //Added to create a label under the chart showing what the displayed information is relevent to
-          if(json.courses)
-          {
-              dataset_label = '<span id="canvas_label">';
-              if (json.courses[0].course) {
-                  dataset_label += json.department_name;
-                  dataset_axis = json.department_code + ' Courses';
-              } else {
-                  dataset_label += 'All Departments';
-                  dataset_axis = 'Departments';
-              }
-              if (json.courses[0].section) {
-                  if (json.courses.length == 1) {
-                      dataset_label += ': ' + json.courses[0].title + ' (' + json.courses[0].course + '-' + json.courses[0].section + ')';
-                      dataset_axis = 'Section of ' + json.department_code + ' ' + json.courses[0].course + '-' + json.courses[0].section;
-                  } else {
-                      dataset_label += ': ' + json.courses[0].title + ' (' + json.courses[0].course + ')';
-                      dataset_axis = 'Sections of ' + json.department_code + ' ' + json.courses[0].course;
-                  }
-              }
-              dataset_label += '</span>';
-          }
-          $('#canvas_header').html(dataset_label);
-          $('#canvas_axis').html(dataset_axis);
           
           //Set chart labels & datasets
           var chartData = {
