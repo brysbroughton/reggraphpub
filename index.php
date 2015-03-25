@@ -52,6 +52,7 @@ foreach($semesters as $key=>$value)
     <script src="OTC.Chart.js"></script>
     <script src="OTC.StackedBar.js"></script>
     <script src="enrollment_graph.js"></script>
+	<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=onload" async defer></script>
 </head>
 <body>
   
@@ -140,9 +141,10 @@ foreach($semesters as $key=>$value)
                       <div id="section_info" class="ModularBlock"></div>
                       <div id="feedback_wrapper" class="ModularBlock">
                         <p>Was this page helpful? Tell us about it.</p>
-                        <form id="feedback_form" name="form" action="javascript:mailForm(form.text.value)" method="post" enctype="text/plain">
+                        <form id="feedback_form" name="form" action="backend/canvas_feedback.php" method="post">
                           <textarea id="feedback_text" name="text" placeholder="Type your feedback here..."></textarea>
-                          <input type="submit" id="feedback_submit" value="Submit Feedback"/>
+                          <div class="g-recaptcha" data-sitekey="6LcUAAQTAAAAAGiB8IWVo4D2OsSmX2eHUy461r63"></div>
+						  <input type="button" id="feedback_submit" value="Submit Feedback"/>
                         </form>
                       </div>
                     </div>

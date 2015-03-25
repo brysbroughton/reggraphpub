@@ -29,6 +29,21 @@
             if (self.parameters.department) delete self.parameters.department
             self.pushStateToURL();
         });
+		
+		$("#feedback_submit").bind('click', function(){
+		var captchaResponse = $("#g-recaptcha-response").val();
+		if(captchaResponse && captchaResponse != '')
+		{
+			console.log(captchaResponse);
+			$("#feedback_form").submit();
+		}
+		else
+		{
+			alert('The captcha could not verify that you are human.\nPlease try again.');
+		}
+	});
+		
+		
       };
 
       function OTCChart (chart_id) {
@@ -79,15 +94,25 @@
        
         //@instance method
         this.requestChartJSON = function (end_func) {
-			var url = OTCChart.API_HOST + '?data=enrollment';//this should always be set for the enrollment chart
 			
-            for (param in self.parameters) {//building server-side query from internal parameters
-                if(param == "section"){continue}
-                url += '&' + param + '=' + self.parameters[param];
-            }
+			  var url = OTCChart.API_HOST + '?data=enrollment';//this should always be set for the enrollment chart
+			
+          
+          
+          for (param in self.parameters) {//building server-side query from internal parameters
+            if(param == "section"){
+				continue;
+			}
+			url += '&' + param + '=' + self.parameters[param];
+          }
+          
+            $.getJSON(
+                url,
+                function (data) {
+                    end_func(OTCChart.translateChartData(data));//translate json in to chart.js format
+                }
+            );
             
-            //translate json in to chart.js format
-            $.getJSON(url, function(data) {end_func(OTCChart.translateChartData(data))});
         }
         
         //@instance method
@@ -96,15 +121,16 @@
             var ctx = document.getElementById(self.chart_id).getContext("2d");
             var newWidth = 0;
             
-            //Calcuate canvas width if # of bars exceeds default width
             for(var i = 0; i < chartData.datasets.length; i++) {
                 for(var j = 0; j < chartData.datasets[i].data.length; j++) {newWidth += (5 + 10)}
             }
             newWidth += 20; //Y-axis buffer width
-            if (newWidth >= ctx.canvas.width) {ctx.canvas.width = newWidth}
+            
+            if (newWidth >= ctx.canvas.width) {
+              ctx.canvas.width = newWidth;
+            }
             ctx.canvas.height = 300;
             
-            //Create stackedBar chart
             if (self.myBar) {self.myBar.destroy()}
             self.myBar = new Chart(ctx).StackedBar(chartData, {
                 animation: false,
@@ -114,13 +140,10 @@
 				legendTemplate : "<dl><% for (var i=0; i<datasets.length; i++){%><dt style=\"background-color:<%=datasets[i].fillColor%>;border:1px solid <%=datasets[i].strokeColor%>\"></dt><dd><%if(datasets[i].label){%><%=datasets[i].label%><%}%></dd><%}%></dl>"
             });
             
-            //Watches for bar onclicks
-            ctx.canvas.onclick = function (evt) {
+            ctx.canvas.onclick = function (evt) {//onclick functionality
                 var active_points = self.myBar.getBarsAtEvent(evt);
                 self.initChartFromClick(active_points);
             };
-            
-            //Create chart legend
 	        document.getElementById("canvas_legend").innerHTML = self.myBar.generateLegend();
         }
         
@@ -249,6 +272,7 @@
               }
             ]
           }
+          
           return chartData;
       }
 
