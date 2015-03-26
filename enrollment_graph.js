@@ -31,11 +31,11 @@
         });
 		
 		/* Binding the feedback submission button to the click event */
-		$("#feedback_submit").bind('click', function(){
+		$("#feedback_submit").click(function(){
 			//Changing the jQuery reference to $j for use with the addon needed for this part
 			var $j = jQuery.noConflict();
 				// checking if browser is IE
-				if(checkBrowser('ie'))
+				if(false)//checkBrowser('ie'))
 				{
 					// setting captcha response to some numbers so it is not an empty string
 					var captchaResponse = "12345";
@@ -52,7 +52,7 @@
 					var text = $j("#feedback_text").val();
 					var currentURL = document.URL;
 					// if browser is ie, send extra variable in ajax call
-					if(checkBrowser('ie'))
+					if(false)//checkBrowser('ie'))
 					{
 						var formData = {"text" : text, "recaptcha" : captchaResponse, "ie":"explorer", "url" : currentURL};
 					}
@@ -395,8 +395,7 @@
     
 	/* Browser checking function */
 	/* Moved code from the saveCanvas function to it's own function for use in other places' */
-	function checkBrowser(browser)
-	{
+	function checkBrowser(browser) {
 		switch(browser)
 		{
 			case 'opera':

@@ -1,7 +1,7 @@
 <?php
 /* ini_set('display_errors','On');
 error_reporting(E_ALL | E_STRICT); */
-	//include("/var/www/html/FORMS/class.phpmailer.php");
+	include("/var/www/html/FORMS/class.phpmailer.php");
 	//var_dump($_POST);
 	$formData = json_decode($_POST['data']);
 	
@@ -25,20 +25,20 @@ error_reporting(E_ALL | E_STRICT); */
 	}
 	if($success)
 	{
-		/* // Email for data collector
+		// Email for data collector
 		$msg = "<p>Url at time of feedback submission: ".str_replace("&sect","&amp;sect",$formData->url)."</p>";
 		$msg .= "<p>".$formData->text."</p>";
 		// Create e-mail message for OTC Online using phpmailer
-		$feedback_mail = new phpmailer;
+		/*$feedback_mail = new phpmailer; //This currently breaks; maybe 'new PHPMailer' ?
 		$feedback_mail->From = $formData->email;
 		$feedback_mail->FromName = "Enrollment Graph";
-		$feedback_mail->AddAddress("wrighta@otc.edu", "Aaron Wright");
+		$feedback_mail->AddAddress("freemanl@otc.edu", "First Last");
 		$feedback_mail->WordWrap = 70;
 		$feedback_mail->IsHTML(true);    // set email format to HTML
 		$feedback_mail->Subject = "Canvas Feedback Form ";
 		$feedback_mail->Body = $msg;
 		$feedback_mail->Send();
-		unset($feedback_mail); */
+		unset($feedback_mail);*/
 		$new_response = array('status' => 'success', 'notice'=>'Thank you for your feedback!');
 		ob_clean();
 		print json_encode($new_response);
