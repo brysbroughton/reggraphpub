@@ -1,5 +1,6 @@
 
 <!DOCTYPE html>
+
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -49,10 +50,14 @@ foreach($semesters as $key=>$value)
     <link rel="stylesheet" type="text/css" href="enrollment_graph.css" />
     <script src="https://www.otc.edu/JSSCRIPTS/jquery/jquery-1.6.2.min.js"></script>
     <script src="https://www.otc.edu/JSSCRIPTS/jquery/plugins/json/json.js"></script>
-    <script src="OTC.Chart.js"></script>
+	<script type="text/javascript" src="https://www.otc.edu/JSSCRIPTS/jquery/jquery.extensions.js"></script>
+	<script> var $ = jQuery.noConflict();</script>
+	<script src="OTC.Chart.js"></script>
     <script src="OTC.StackedBar.js"></script>
     <script src="enrollment_graph.js"></script>
 	<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=onload" async defer></script>
+	
+	
 </head>
 <body>
   
@@ -118,6 +123,7 @@ foreach($semesters as $key=>$value)
                           Sorry, this application requires javascript. Please <a href="http://support.microsoft.com/gp/howtoscript" target="_blank">enable javascript</a> to continue.
                         </noscript>
                       </div>
+					  <div class="clearfix"></div>
                       <div id="canvas_wrapper">
                         <!--[if lt IE 9]>
                           Sorry, this application requires <a href="http://www.w3schools.com/canvas/default.asp" target="_blank">canvas support</a>.

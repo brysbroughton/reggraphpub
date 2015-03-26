@@ -31,17 +31,61 @@
         });
 		
 		$("#feedback_submit").bind('click', function(){
-		var captchaResponse = $("#g-recaptcha-response").val();
-		if(captchaResponse && captchaResponse != '')
-		{
-			console.log(captchaResponse);
-			$("#feedback_form").submit();
-		}
-		else
-		{
-			alert('The captcha could not verify that you are human.\nPlease try again.');
-		}
-	});
+			var $j = jQuery.noConflict();
+				
+				if(checkBrowser('ie'))
+				{
+					var captchaResponse = "12345";
+				}
+				else
+				{
+					var captchaResponse = $j("#g-recaptcha-response").val();
+				}
+				
+				if(captchaResponse && captchaResponse != '')
+				{
+					//console.log(captchaResponse);
+					//$("#feedback_form").submit();
+					var text = $j("#feedback_text").val();
+					var currentURL = document.URL;
+					if(checkBrowser('ie'))
+					{
+						var formData = {"text" : text, "recaptcha" : captchaResponse, "ie":"explorer", "url" : currentURL};
+					}
+					else
+					{
+						var formData = {"text" : text, "recaptcha" : captchaResponse, "url" : currentURL};
+					}
+					
+					//console.log(formData['g-recaptcha-response']);
+					var data = $j.toJSON(formData);
+					//alert(data);
+					//var $j = jQuery.noConflict();
+					$j.postJSON('/canvas/backend/canvas_feedback.php',{'data':data},function(response){
+						//alert(response.status);
+						if(response.status == 'success'){
+							if(response.notice){
+								//alert(response.notice);
+								$j('#feedback_text').val(response.notice);	
+								$j('#feedback_text').prop('disabled', true);
+								$j('#feedback_submit').val('Submitted');
+								$j('#feedback_submit').prop('disabled', true);
+							}else{
+								//alert('no notice');
+							}
+						}else{
+							alert("The captcha could not verify that you are human.\nPlease try again.");
+						}
+					});
+					
+				}
+				else
+				{
+					alert('The captcha could not verify that you are human.\nPlease try again.');
+				}
+			
+			var $ = jQuery.noConflict();
+		});
 		
 		
       };
@@ -282,22 +326,8 @@
 		var button = document.getElementById('download_button');
 		var filename = document.getElementById('canvas_label').innerText;
 		
-        // Opera 8.0+ (UA detection to detect Blink/v8-powered Opera)
-		var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
         
-        // Firefox 1.0+
-		var isFirefox = typeof InstallTrigger !== 'undefined';
-        
-        // At least Safari 3+: "[object HTMLElementConstructor]"
-		var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
-        
-        // Chrome 1+
-		var isChrome = !!window.chrome && !isOpera;
-        
-        // At least IE6
-		var isIE = /*@cc_on!@*/false || !!document.documentMode;
-		
-		if(isIE) {
+		if(checkBrowser('ie')) {
 			var instructions = "<p>To save this image, right-click on the image and select \"Save picture as\".</p>";
 			open().document.write(instructions + '<img src="'+dataURL+'"/>');
 			return false;
@@ -366,6 +396,40 @@
 		return formattedTime;
 	}
     
+	/* Browser checking function */
+	function checkBrowser(browser)
+	{
+		switch(browser)
+		{
+			case 'opera':
+				// Opera 8.0+ (UA detection to detect Blink/v8-powered Opera)
+				var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+				return isOpera;
+			case 'firefox':
+				// Firefox 1.0+
+				var isFirefox = typeof InstallTrigger !== 'undefined';
+				return isFirefox;
+			case 'safari':
+				// At least Safari 3+: "[object HTMLElementConstructor]"
+				var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
+				return isSafari;
+			case 'chrome':
+				// Chrome 1+
+				var isChrome = !!window.chrome && !isOpera;
+				return isChrome;
+			case 'ie':
+				// At least IE6
+				var isIE = /*@cc_on!@*/false || !!document.documentMode;
+				return isIE;
+		}
+	}
+	/* IE Version Checking*/
+	function ie9()
+	
+	{
+		
+	}
+	
     /* Feedback Form */
     function mailForm(text) {
         var form = 'mailto:web@otc.edu?subject=Real-Time%20Enrollment%20Graph%20Feedback&body=' + text + '%0D%0A-Anonymous';

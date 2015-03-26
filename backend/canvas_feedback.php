@@ -1,41 +1,52 @@
 <?php
-ini_set('display_errors','On');
-error_reporting(E_ALL | E_STRICT);
-	include("/var/www/html/FORMS/class.phpmailer.php");
+/* ini_set('display_errors','On');
+error_reporting(E_ALL | E_STRICT); */
+	//include("/var/www/html/FORMS/class.phpmailer.php");
 	//var_dump($_POST);
-	$captcha = "";
-	if(isset($_POST['g-recaptcha-response']))
+	$formData = json_decode($_POST['data']);
+	if(isset($formData->ie))
 	{
-		$captcha = trim($_POST['g-recaptcha-response']);
-	}
-	$response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=6LcUAAQTAAAAACB6FV1vIllOUvpAaTJ789xmxUx2&response=".$captcha);
-	//print($response);
-	
-	//$msg = "<p>".$isValid."</p>";
-	$msg = "";
-	$response = json_decode($response);
-	$success = $response->success;
-	//print_r($_POST);
-	if($success)
-	{
-		// Email for data collector
-		$msg .= $_POST['text'];
-		
-		// Create e-mail message for OTC Online using phpmailer
-		$feedback_mail = new phpmailer;
-		$feedback_mail->From = $formData->email;
-		$feedback_mail->FromName = $formData->firstName . " " . $formData->lastName;
-		$feedback_mail->AddAddress("wrighta@otc.edu", "Aaron Wright");
-		$feedback_mail->WordWrap = 70;
-		$feedback_mail->IsHTML(true);    // set email format to HTML
-		$feedback_mail->Subject = "Success Coach Application Submission ";
-		$feedback_mail->Body = $msg;
-		$feedback_mail->Send();
-		unset($feedback_mail);
-		header("Location: /confirmation.php");
+		$success = true;
 	}
 	else
 	{
-		print("<h3>Something went wrong.</h3><p>The captcha was not solved correctly. Please use your browser's back button to return to the form and try again.'</p>");
+		$captcha = "";
+		if(isset($formData->recaptcha))
+		{
+			$captcha = $formData->recaptcha;
+		}
+		$response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=6LcUAAQTAAAAACB6FV1vIllOUvpAaTJ789xmxUx2&response=".$captcha);
+		
+		
+		$response = json_decode($response);
+		$success = $response->success;
+	}
+	if($success)
+	{
+		/* // Email for data collector
+		$msg = "<p>Url at time of feedback submission: ".str_replace("&sect","&amp;sect",$formData->url)."</p>";
+		$msg .= "<p>".$formData->text."</p>";
+		// Create e-mail message for OTC Online using phpmailer
+		$feedback_mail = new phpmailer;
+		$feedback_mail->From = $formData->email;
+		$feedback_mail->FromName = "Enrollment Graph";
+		$feedback_mail->AddAddress("wrighta@otc.edu", "Aaron Wright");
+		$feedback_mail->WordWrap = 70;
+		$feedback_mail->IsHTML(true);    // set email format to HTML
+		$feedback_mail->Subject = "Canvas Feedback Form ";
+		$feedback_mail->Body = $msg;
+		$feedback_mail->Send();
+		unset($feedback_mail); */
+		$new_response = array('status' => 'success', 'notice'=>'Thank you for your feedback!');
+		ob_clean();
+		print json_encode($new_response);
+		exit();
+	}
+	else
+	{
+		$new_response = array('status' => 'failed', 'notice'=>"Something went wrong. Please try sending your feedback again.");
+		ob_clean();
+		print json_encode($new_response);
+		exit();
 	}
 ?>
