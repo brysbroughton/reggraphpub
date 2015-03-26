@@ -4,6 +4,8 @@ error_reporting(E_ALL | E_STRICT); */
 	//include("/var/www/html/FORMS/class.phpmailer.php");
 	//var_dump($_POST);
 	$formData = json_decode($_POST['data']);
+	
+	/* If browser is IE, skip the captcha checking */
 	if(isset($formData->ie))
 	{
 		$success = true;

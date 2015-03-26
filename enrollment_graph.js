@@ -30,11 +30,14 @@
             self.pushStateToURL();
         });
 		
+		/* Binding the feedback submission button to the click event */
 		$("#feedback_submit").bind('click', function(){
+			//Changing the jQuery reference to $j for use with the addon needed for this part
 			var $j = jQuery.noConflict();
-				
+				// checking if browser is IE
 				if(checkBrowser('ie'))
 				{
+					// setting captcha response to some numbers so it is not an empty string
 					var captchaResponse = "12345";
 				}
 				else
@@ -48,6 +51,7 @@
 					//$("#feedback_form").submit();
 					var text = $j("#feedback_text").val();
 					var currentURL = document.URL;
+					// if browser is ie, send extra variable in ajax call
 					if(checkBrowser('ie'))
 					{
 						var formData = {"text" : text, "recaptcha" : captchaResponse, "ie":"explorer", "url" : currentURL};
@@ -83,11 +87,9 @@
 				{
 					alert('The captcha could not verify that you are human.\nPlease try again.');
 				}
-			
+			// changing the jQuery reference back to $ for everything outside of this function
 			var $ = jQuery.noConflict();
 		});
-		
-		
       };
 
       function OTCChart (chart_id) {
@@ -377,6 +379,7 @@
 		$('#' + divName).html(section_data);
 	}
 	
+	/* Function to convert time to human readable format */
 	function convert_time(val) {
 		var date = new Date((val*1000));
         
@@ -397,6 +400,7 @@
 	}
     
 	/* Browser checking function */
+	/* Moved code from the saveCanvas function to it's own function for use in other places' */
 	function checkBrowser(browser)
 	{
 		switch(browser)
@@ -423,12 +427,7 @@
 				return isIE;
 		}
 	}
-	/* IE Version Checking*/
-	function ie9()
 	
-	{
-		
-	}
 	
     /* Feedback Form */
     function mailForm(text) {
