@@ -29,6 +29,67 @@
             if (self.parameters.department) delete self.parameters.department
             self.pushStateToURL();
         });
+		
+		/* Binding the feedback submission button to the click event */
+		$("#feedback_submit").bind('click', function(){
+			//Changing the jQuery reference to $j for use with the addon needed for this part
+			var $j = jQuery.noConflict();
+				// checking if browser is IE
+				if(checkBrowser('ie'))
+				{
+					// setting captcha response to some numbers so it is not an empty string
+					var captchaResponse = "12345";
+				}
+				else
+				{
+					var captchaResponse = $j("#g-recaptcha-response").val();
+				}
+				
+				if(captchaResponse && captchaResponse != '')
+				{
+					//console.log(captchaResponse);
+					//$("#feedback_form").submit();
+					var text = $j("#feedback_text").val();
+					var currentURL = document.URL;
+					// if browser is ie, send extra variable in ajax call
+					if(checkBrowser('ie'))
+					{
+						var formData = {"text" : text, "recaptcha" : captchaResponse, "ie":"explorer", "url" : currentURL};
+					}
+					else
+					{
+						var formData = {"text" : text, "recaptcha" : captchaResponse, "url" : currentURL};
+					}
+					
+					//console.log(formData['g-recaptcha-response']);
+					var data = $j.toJSON(formData);
+					//alert(data);
+					//var $j = jQuery.noConflict();
+					$j.postJSON('/canvas/backend/canvas_feedback.php',{'data':data},function(response){
+						//alert(response.status);
+						if(response.status == 'success'){
+							if(response.notice){
+								//alert(response.notice);
+								$j('#feedback_text').val(response.notice);	
+								$j('#feedback_text').prop('disabled', true);
+								$j('#feedback_submit').val('Submitted');
+								$j('#feedback_submit').prop('disabled', true);
+							}else{
+								//alert('no notice');
+							}
+						}else{
+							alert("The captcha could not verify that you are human.\nPlease try again.");
+						}
+					});
+					
+				}
+				else
+				{
+					alert('The captcha could not verify that you are human.\nPlease try again.');
+				}
+			// changing the jQuery reference back to $ for everything outside of this function
+			var $ = jQuery.noConflict();
+		});
       };
 
       function OTCChart (chart_id) {
@@ -79,13 +140,18 @@
        
         //@instance method
         this.requestChartJSON = function (end_func) {
-			var url = OTCChart.API_HOST + '?data=enrollment';//this should always be set for the enrollment chart
 			
-            for (param in self.parameters) {//building server-side query from internal parameters
-                if(param == "section"){continue}
-                url += '&' + param + '=' + self.parameters[param];
-            }
-            
+			  var url = OTCChart.API_HOST + '?data=enrollment';//this should always be set for the enrollment chart
+			
+          
+          
+          for (param in self.parameters) {//building server-side query from internal parameters
+            if(param == "section"){
+				continue;
+			}
+			url += '&' + param + '=' + self.parameters[param];
+          }
+          
             //translate json in to chart.js format
             $.getJSON(url, function(data) {end_func(OTCChart.translateChartData(data), data)});
         }
@@ -122,15 +188,16 @@
             $('#canvas_header').html(dataset_label);
             $('#canvas_axis').html(dataset_axis);
             
-            //Calcuate canvas width if # of bars exceeds default width
             for(var i = 0; i < chartData.datasets.length; i++) {
                 for(var j = 0; j < chartData.datasets[i].data.length; j++) {newWidth += (5 + 10)}
             }
             newWidth += 20; //Y-axis buffer width
-            if (newWidth >= ctx.canvas.width) {ctx.canvas.width = newWidth}
+            
+            if (newWidth >= ctx.canvas.width) {
+              ctx.canvas.width = newWidth;
+            }
             ctx.canvas.height = 300;
             
-            //Create stackedBar chart
             if (self.myBar) {self.myBar.destroy()}
             self.myBar = new Chart(ctx).StackedBar(chartData, {
                 animation: false,
@@ -140,13 +207,10 @@
 				legendTemplate : "<dl><% for (var i=0; i<datasets.length; i++){%><dt style=\"background-color:<%=datasets[i].fillColor%>;border:1px solid <%=datasets[i].strokeColor%>\"></dt><dd><%if(datasets[i].label){%><%=datasets[i].label%><%}%></dd><%}%></dl>"
             });
             
-            //Watches for bar onclicks
-            ctx.canvas.onclick = function (evt) {
+            ctx.canvas.onclick = function (evt) {//onclick functionality
                 var active_points = self.myBar.getBarsAtEvent(evt);
                 self.initChartFromClick(active_points);
             };
-            
-            //Create chart legend
 	        document.getElementById("canvas_legend").innerHTML = self.myBar.generateLegend();
         }
         
@@ -248,6 +312,7 @@
               }
             ]
           }
+          
           return chartData;
       }
 
@@ -257,22 +322,8 @@
 		var button = document.getElementById('download_button');
 		var filename = document.getElementById('canvas_label').innerText;
 		
-        // Opera 8.0+ (UA detection to detect Blink/v8-powered Opera)
-		var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
         
-        // Firefox 1.0+
-		var isFirefox = typeof InstallTrigger !== 'undefined';
-        
-        // At least Safari 3+: "[object HTMLElementConstructor]"
-		var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
-        
-        // Chrome 1+
-		var isChrome = !!window.chrome && !isOpera;
-        
-        // At least IE6
-		var isIE = /*@cc_on!@*/false || !!document.documentMode;
-		
-		if(isIE) {
+		if(checkBrowser('ie')) {
 			var instructions = "<p>To save this image, right-click on the image and select \"Save picture as\".</p>";
 			open().document.write(instructions + '<img src="'+dataURL+'"/>');
 			return false;
@@ -322,6 +373,7 @@
 		$('#' + divName).html(section_data);
 	}
 	
+	/* Function to convert time to human readable format */
 	function convert_time(val) {
 		var date = new Date((val*1000));
         
@@ -341,6 +393,36 @@
 		return formattedTime;
 	}
     
+	/* Browser checking function */
+	/* Moved code from the saveCanvas function to it's own function for use in other places' */
+	function checkBrowser(browser)
+	{
+		switch(browser)
+		{
+			case 'opera':
+				// Opera 8.0+ (UA detection to detect Blink/v8-powered Opera)
+				var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+				return isOpera;
+			case 'firefox':
+				// Firefox 1.0+
+				var isFirefox = typeof InstallTrigger !== 'undefined';
+				return isFirefox;
+			case 'safari':
+				// At least Safari 3+: "[object HTMLElementConstructor]"
+				var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
+				return isSafari;
+			case 'chrome':
+				// Chrome 1+
+				var isChrome = !!window.chrome && !isOpera;
+				return isChrome;
+			case 'ie':
+				// At least IE6
+				var isIE = /*@cc_on!@*/false || !!document.documentMode;
+				return isIE;
+		}
+	}
+	
+	
     /* Feedback Form */
     function mailForm(text) {
         var form = 'mailto:web@otc.edu?subject=Real-Time%20Enrollment%20Graph%20Feedback&body=' + text + '%0D%0A-Anonymous';

@@ -1,5 +1,6 @@
 
 <!DOCTYPE html>
+
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -49,9 +50,14 @@ foreach($semesters as $key=>$value)
     <link rel="stylesheet" type="text/css" href="enrollment_graph.css" />
     <script src="https://www.otc.edu/JSSCRIPTS/jquery/jquery-1.6.2.min.js"></script>
     <script src="https://www.otc.edu/JSSCRIPTS/jquery/plugins/json/json.js"></script>
-    <script src="OTC.Chart.js"></script>
+	<script type="text/javascript" src="https://www.otc.edu/JSSCRIPTS/jquery/jquery.extensions.js"></script>
+	<script> var $ = jQuery.noConflict();</script>
+	<script src="OTC.Chart.js"></script>
     <script src="OTC.StackedBar.js"></script>
     <script src="enrollment_graph.js"></script>
+	<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=onload" async defer></script>
+	
+	
 </head>
 <body>
   
@@ -117,6 +123,7 @@ foreach($semesters as $key=>$value)
                           Sorry, this application requires javascript. Please <a href="http://support.microsoft.com/gp/howtoscript" target="_blank">enable javascript</a> to continue.
                         </noscript>
                       </div>
+					  <div class="clearfix"></div>
                       <div id="canvas_wrapper">
                         <!--[if lt IE 9]>
                           Sorry, this application requires <a href="http://www.w3schools.com/canvas/default.asp" target="_blank">canvas support</a>.
@@ -140,9 +147,10 @@ foreach($semesters as $key=>$value)
                       <div id="section_info" class="ModularBlock"></div>
                       <div id="feedback_wrapper" class="ModularBlock">
                         <p>Was this page helpful? Tell us about it.</p>
-                        <form id="feedback_form" name="form" action="javascript:mailForm(form.text.value)" method="post" enctype="text/plain">
+                        <form id="feedback_form" name="form" action="backend/canvas_feedback.php" method="post">
                           <textarea id="feedback_text" name="text" placeholder="Type your feedback here..."></textarea>
-                          <input type="submit" id="feedback_submit" value="Submit Feedback"/>
+                          <div class="g-recaptcha" data-sitekey="6LcUAAQTAAAAAGiB8IWVo4D2OsSmX2eHUy461r63"></div>
+						  <input type="button" id="feedback_submit" value="Submit Feedback"/>
                         </form>
                       </div>
                     </div>
