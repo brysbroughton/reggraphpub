@@ -1,3 +1,5 @@
+(function () {//closure of all names in the document
+
       window.onload = function () {
         //Set all necessary default values & inits
 	    enrollment_chart = new OTCChart('async_canvas');
@@ -5,7 +7,6 @@
 	    enrollment_chart.parameters.semester = enrollment_chart.parameters.semester || 'summer';
 	    enrollment_chart.pushStateToURL();
 	    enrollment_chart.initChart();        
-	    console.log(enrollment_chart.parameters);
 	    
 	    //Sets semester drop-down value & loads new semester if drop-down is changed
 	    $('#semester').val(enrollment_chart.parameters.semester);
@@ -47,8 +48,6 @@
 				
 				if(captchaResponse && captchaResponse != '')
 				{
-					//console.log(captchaResponse);
-					//$("#feedback_form").submit();
 					var text = $j("#feedback_text").val();
 					var currentURL = document.URL;
 					// if browser is ie, send extra variable in ajax call
@@ -61,21 +60,17 @@
 						var formData = {"text" : text, "recaptcha" : captchaResponse, "url" : currentURL};
 					}
 					
-					//console.log(formData['g-recaptcha-response']);
 					var data = $j.toJSON(formData);
-					//alert(data);
-					//var $j = jQuery.noConflict();
-					$j.postJSON('/canvas/backend/canvas_feedback.php',{'data':data},function(response){
-						//alert(response.status);
+
+					$j.postJSON('/reggraph/handler.feedback.php',{'data':data},function(response){
 						if(response.status == 'success'){
 							if(response.notice){
-								//alert(response.notice);
 								$j('#feedback_text').val(response.notice);	
 								$j('#feedback_text').prop('disabled', true);
 								$j('#feedback_submit').val('Submitted');
 								$j('#feedback_submit').prop('disabled', true);
 							}else{
-								//alert('no notice');
+								//pass
 							}
 						}else{
 							alert("The captcha could not verify that you are human.\nPlease try again.");
@@ -141,7 +136,7 @@
         //@instance method
         this.requestChartJSON = function (end_func) {
 			
-			  var url = OTCChart.API_HOST + '?data=enrollment';//this should always be set for the enrollment chart
+			var url = OTCChart.API_HOST + '?data=enrollment';//this should always be set for the enrollment chart
 			
           
           
@@ -153,7 +148,7 @@
           }
           
             //translate json in to chart.js format
-            $.getJSON(url, function(data) {end_func(OTCChart.translateChartData(data), data)});
+            $.getJSON(url, function(data) {end_func(OTCChart.translateChartData(data), data)});//in this app, the end func is always genChartFromJSON
         }
         
         //@instance method
@@ -258,7 +253,7 @@
 
       //@static constants
       OTCChart.VALID_PARAMETERS = ['DATA','DEPARTMENT','COURSE','SECTION','ORDERBY','SEMESTER'];
-      OTCChart.API_HOST = 'http://webdev.otc.edu/canvas/backend/classpull.php';
+      OTCChart.API_HOST = 'http://www.otc.edu/reggraph/api/classpull.php';
 
       //@static methods of OTCChart
       OTCChart.isValidParameter = function (param_name) {
@@ -326,17 +321,15 @@
 		if(checkBrowser('ie')) {
 			var instructions = "<p>To save this image, right-click on the image and select \"Save picture as\".</p>";
 			open().document.write(instructions + '<img src="'+dataURL+'"/>');
-			return false;
 		} else {
 			button.href = dataURL;
 			button.download = filename + '.png';
-            //Doesn't return in this instance? <Louis>
 		}
 	}
 
 	function orderBy(col_name) {
 		var a_or_d = enrollment_chart.parameters.orderby;
-		//delete enrollment_chart.parameters.orderby;
+
 		if(col_name == 'name') {
 			if(enrollment_chart.parameters.course) {enrollment_chart.parameters.orderby = 'section'}
 			else if(enrollment_chart.parameters.department) {enrollment_chart.parameters.orderby = 'course'}
@@ -359,10 +352,7 @@
 			if(sec_data['courses'][0].hasOwnProperty(prop)) {
 				if(prop != "id" && prop != "synonym" && prop != "note" && prop != "row_type") {
 					section_data += "<dt>" + prop.charAt(0).toUpperCase() + prop.slice(1);
-					section_data +=  ": </dt>";
-				}
-				if(prop != "id" && prop != "synonym" && prop != "note" && prop != "row_type") {
-					section_data += "<dd>";
+					section_data +=  ": </dt><dd>";
 					if(prop == "start" || prop == "end") {section_data += convert_time((sec_data['courses'][0][prop]))}
 					else {section_data += sec_data['courses'][0][prop]}
 					section_data += "</dd>";
@@ -394,7 +384,6 @@
 	}
     
 	/* Browser checking function */
-	/* Moved code from the saveCanvas function to it's own function for use in other places' */
 	function checkBrowser(browser) {
 		switch(browser)
 		{
@@ -420,10 +409,6 @@
 				return isIE;
 		}
 	}
-	
-	
-    /* Feedback Form */
-    function mailForm(text) {
-        var form = 'mailto:web@otc.edu?subject=Real-Time%20Enrollment%20Graph%20Feedback&body=' + text + '%0D%0A-Anonymous';
-        window.location.href = form;
-    }
+
+//end closure
+})()

@@ -3,17 +3,11 @@
 ------------------------------*/
 
 #content {width: 100% !important}
-
 #content_body {float: none}
-
 #content_footer {width: 100% !important}
-
 #announcement_text_ifr {height: 300px !important}
-
 h2 {margin: 0}
-
 dl, dt, dd, dl dt, dl dd {margin:0}
-
 
 /*------------------------------
               CANVAS
@@ -34,7 +28,7 @@ dl, dt, dd, dl dt, dl dd {margin:0}
   text-align: center;
 }
 
-  #canvas_label {font-size:16px; font-weight:900}
+#canvas_label {font-size:16px; font-weight:900}
 
 #canvas_wrapper {
   width: 100%;
@@ -118,6 +112,6 @@ dl, dt, dd, dl dt, dl dd {margin:0}
 
 
 .clearfix:after{content:" ";display:block;clear:both;}
-.ModularBlock{float:left;margin:20px 0px 20px 0px;margin-collapse:collapse;}
+.ModularBlock{float:left;margin:20px 0px 20px 0px;}
 .ModularBlock > *{padding:10px;}
-#section_info.ModularBlock{padding-left:0px;}
+ModularBlock:first-child{padding-left:0px;}

@@ -1,8 +1,8 @@
 <?php
 /* ini_set('display_errors','On');
 error_reporting(E_ALL | E_STRICT); */
-	include 'class.phpmailer.php';
-	//var_dump($_POST);
+	include '/var/www/html/PHPSCRIPTS/classes/class.phpmailer.php';
+
 	$formData = json_decode($_POST['data']);
 	
 	/* If browser is IE, skip the captcha checking */
@@ -32,23 +32,20 @@ error_reporting(E_ALL | E_STRICT); */
 		$feedback_mail = new PHPMailer;
 		$feedback_mail->From = $formData->email;
 		$feedback_mail->FromName = "Enrollment Graph";
-		$feedback_mail->AddAddress("freemanl@otc.edu", "First Last");
+		$feedback_mail->AddAddress("web@otc.edu", "Web Services");
 		$feedback_mail->WordWrap = 70;
 		$feedback_mail->IsHTML(true);    // set email format to HTML
-		$feedback_mail->Subject = "Canvas Feedback Form ";
+		$feedback_mail->Subject = "Canvas Feedback Form Submission";
 		$feedback_mail->Body = $msg;
 		$feedback_mail->Send();
 		unset($feedback_mail);
 		$new_response = array('status' => 'success', 'notice'=>'Thank you for your feedback!');
-		ob_clean();
 		print json_encode($new_response);
-		exit();
 	}
 	else
 	{
 		$new_response = array('status' => 'failed', 'notice'=>"Something went wrong. Please try sending your feedback again.");
-		ob_clean();
 		print json_encode($new_response);
-		exit();
 	}
+	exit();
 ?>

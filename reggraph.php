@@ -20,8 +20,8 @@ else
     $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
 }
 
-$pageTitle = "Real-time Enrollment Graph";
-$pageDescription = "View OTC Course Enrollments in real time. Generate graphs interactively.";
+$pageTitle = "Real-time Registration Graph";
+$pageDescription = "View OTC Course Registration in real time. Generate graphs interactively.";
 
 // Getting available semesters from database
 $semesters_avail = "";
@@ -42,10 +42,10 @@ foreach($semesters as $key=>$value)
     <!-- open graph meta properties -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="<?php echo $pageURL; ?>" />
-    <meta property="og:image" content="http://www.otc.edu/images/otc-burst.jpg" />
+    <meta property="og:image" content="http://www.otc.edu/reggraph/graph-Art-And-Experience_optimized.png" />
     <meta property="og:title" content="<?php echo $pageTitle; ?>" />
     <meta property="og:description" content="<?php echo $pageDescription; ?>" />
-    <title>Real-time Enrollment Graph</title>
+    <title>Real-time Registration Graph</title>
     <link rel="stylesheet" href="/base.css" type="text/css" media="screen" charset="utf-8" />
     <link rel="stylesheet" type="text/css" href="enrollment_graph.css" />
     <script src="https://www.otc.edu/JSSCRIPTS/jquery/jquery-1.6.2.min.js"></script>
@@ -116,7 +116,7 @@ foreach($semesters as $key=>$value)
         <div id="content" class="full wrapper">
             <div id="content_body" class="full_page boxes wrapper">
                 <div id="content_body_inner" class="wrapper">
-                    <h2>Real-time Enrollment Graph</h2>
+                    <h2>Real-time Registration Graph</h2>
                     <div id="content_body_inner_content" class="wrapper">
                       <div id="canvas_header">
                         <noscript>
