@@ -31,65 +31,10 @@
             self.pushStateToURL();
         });
 		
-		/* Binding the feedback submission button to the click event */
-		$("#feedback_submit").click(function(){
-			//Changing the jQuery reference to $j for use with the addon needed for this part
-			var $j = jQuery.noConflict();
-				// checking if browser is IE
-				if(false)//checkBrowser('ie'))
-				{
-					// setting captcha response to some numbers so it is not an empty string
-					var captchaResponse = "12345";
-				}
-				else
-				{
-					var captchaResponse = $j("#g-recaptcha-response").val();
-				}
-				
-				if(captchaResponse && captchaResponse != '')
-				{
-					var text = $j("#feedback_text").val();
-					var currentURL = document.URL;
-					// if browser is ie, send extra variable in ajax call
-					if(false)//checkBrowser('ie'))
-					{
-						var formData = {"text" : text, "recaptcha" : captchaResponse, "ie":"explorer", "url" : currentURL};
-					}
-					else
-					{
-						var formData = {"text" : text, "recaptcha" : captchaResponse, "url" : currentURL};
-					}
-					
-					var data = $j.toJSON(formData);
-
-					$j.postJSON('/reggraph/handler.feedback.php',{'data':data},function(response){
-						if(response.status == 'success'){
-							if(response.notice){
-								$j('#feedback_text').val(response.notice);	
-								$j('#feedback_text').prop('disabled', true);
-								$j('#feedback_submit').val('Submitted');
-								$j('#feedback_submit').prop('disabled', true);
-							}else{
-								//pass
-							}
-						}else{
-							alert("The captcha could not verify that you are human.\nPlease try again.");
-						}
-					});
-					
-				}
-				else
-				{
-					alert('The captcha could not verify that you are human.\nPlease try again.');
-				}
-			// changing the jQuery reference back to $ for everything outside of this function
-			var $ = jQuery.noConflict();
-		});
       };
 
       function OTCChart (chart_id) {
         // @class
-        // instantiate using keyword 'new'
         var self = this;//closure to pass to anon functions, will always refer to this instance of OTCChart
         this.chart_id = chart_id;
         this.parameters = {'data':'enrollment'};//default is enrollment for all college
@@ -119,6 +64,7 @@
             self.parameters = new_params;
         }
         
+		//@instance method
         this.pushStateToURL = function () {
             var new_url = [location.protocol, '//', location.host, location.pathname].join('');
             new_url += '#!';
@@ -138,10 +84,8 @@
 			
 			var url = OTCChart.API_HOST + '?data=enrollment';//this should always be set for the enrollment chart
 			
-          
-          
           for (param in self.parameters) {//building server-side query from internal parameters
-            if(param == "section"){
+            if(param == "section"){//never build a chart of a single bar
 				continue;
 			}
 			url += '&' + param + '=' + self.parameters[param];
@@ -222,7 +166,7 @@
                 else if (self.parameters.department) {self.parameters.course = clicked_parameter}
                 else {self.parameters.department = clicked_parameter} //this is the most general selection that can happen
             }
-            self.pushStateToURL();
+            self.pushStateToURL();//triggers page refresh, regular init
             self.requestChartJSON(self.genChartFromJSON);
         }
        
@@ -264,7 +208,6 @@
       //@static method
       OTCChart.translateChartData = function (json) {
           //take a json object and translate it to the nested array that canvas expects
-          if(enrollment_chart.parameters.data == "all"){enrollment_chart.parameters.sectionInfo = json}
           
           var headings = [];
           var empty_counts = [];
