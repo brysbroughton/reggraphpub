@@ -1,6 +1,7 @@
 # reggraphpub
 <h1>Interactive Real-time Registration Graph</h1>
 <h2>Overview</h2>
+<p><a href="http://www.otc.edu/reggraph/reggraph.php#!semester=fall" target="_blank">View live demonstration</a></p>
 <p>The Real-time Registration graph was created by the dev team at OTC Web Services to provide a friendly and engaging interface 
 to the current registration trends at the OTC college.</p>
 <p>By clicking the bars of the graph, a new graph is generated with the clicked bar as a parameter to 
